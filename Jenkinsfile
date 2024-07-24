@@ -55,9 +55,9 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            // Clean up actions, such as deleting old images or workspace
-        }
-    }
+//     post {
+//         always {
+//             // Clean up actions, such as deleting old images or workspace
+//         }
+//     }
 }
