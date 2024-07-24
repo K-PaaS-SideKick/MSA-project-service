@@ -16,7 +16,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-                git 'https://github.com/SangWookie/SideKick_Project_Service'
+                git credentialsId: 'ssh-credentials-id', branch: 'main', url: 'https://github.com/SangWookie/SideKick_Project_Service'
             }
         }
 
