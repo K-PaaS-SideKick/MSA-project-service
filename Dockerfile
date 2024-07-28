@@ -1,33 +1,23 @@
-#FROM bellsoft/liberica-openjdk-alpine:17
-## or
-## FROM openjdk:8-jdk-alpine
-## FROM openjdk:11-jdk-alpine
-#
-#CMD ["./gradlew", "clean", "build"]
-## or Maven
-## CMD ["./mvnw", "clean", "package"]
-#
-#VOLUME /tmp
-#
-#ARG JAR_FILE=build/libs/*.jar
-## or Maven
-## ARG JAR_FILE_PATH=target/*.jar
-#
-#COPY ${JAR_FILE} app.jar
-#
-#EXPOSE 8080
-#
-#ENTRYPOINT ["java","-jar","/app.jar"]
-
 # 1단계: Gradle을 사용하여 애플리케이션 빌드
 FROM gradle:8.0-jdk17 AS build
 
 # 프로젝트 소스와 Gradle 캐시를 복사
-COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 
+# Gradle wrapper 캐시를 활용하기 위해 필요한 파일만 먼저 복사
+COPY gradle /home/gradle/project/gradle
+COPY gradlew /home/gradle/project/
+COPY build.gradle /home/gradle/project/
+COPY settings.gradle /home/gradle/project/
+
+# Gradle wrapper와 종속성 다운로드
+RUN ./gradlew dependencies --no-daemon
+
+# 소스 파일 전체를 복사
+COPY . /home/gradle/project
+
 # Gradle을 사용하여 애플리케이션 빌드
-RUN gradle build --no-daemon
+RUN ./gradlew clean build --no-daemon
 
 # 2단계: 빌드된 애플리케이션을 실행할 런타임 이미지 생성
 FROM bellsoft/liberica-openjdk-alpine:17
