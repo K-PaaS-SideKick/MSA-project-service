@@ -27,6 +27,11 @@ pipeline {
                     docker.build(DOCKER_IMAGE_NAME)
                 }
             }
+//             steps {
+//                     container('docker') {
+//                       sh 'docker build -t ss69261/testing-image:latest .'
+//                     }
+//                   }
         }
 
         stage('Push Docker Image') {
