@@ -21,7 +21,8 @@ pipeline {
             steps {
                     withCredentials([file(credentialsId: 'applicationYML', variable: 'application')]) {
                     //   sh 'cp ${application}  src/main/resources/application.yml'
-                       bat 'copy %application% src\\main\\resources\\application.yml'
+                        bat 'if not exist src\\main\\resources\\ mkdir src\\main\\resources'
+                        bat 'copy %application% src\\main\\resources\\application.yml'
                     }
 
             }
