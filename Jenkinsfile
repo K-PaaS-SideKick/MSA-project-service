@@ -3,14 +3,11 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'Docker_sangwookie'
-        DOCKER_IMAGE_NAME = 'sidekick-project-service'
+        DOCKER_IMAGE_NAME = 'sangwookie/sidekick-project-service:latest'
         KUBECONFIG_CREDENTIALS_ID = 'jenkins'
         KUBERNETES_NAMESPACE = 'jenkins'
-
-        SPRING_DATASOURCE_URL = credentials('spring-datasource-url')
-        SPRING_DATASOURCE_USERNAME = credentials('spring-datasource-username')
-        SPRING_DATASOURCE_PASSWORD = credentials('spring-datasource-password')
     }
+
 
     stages {
         stage('Clone Repository') {
@@ -20,18 +17,22 @@ pipeline {
             }
         }
 
+        stage('Add Env') {
+            steps {
+                    withCredentials([file(credentialsId: 'applicationYML', variable: 'application')]) {
+                    //   sh 'cp ${application}  src/main/resources/application.yml'
+                       bat 'copy %application% src\\main\\resources\\application.yml'
+                    }
+
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Build Docker image
+                script{
                     docker.build(DOCKER_IMAGE_NAME)
                 }
             }
-//             steps {
-//                     container('docker') {
-//                       sh 'docker build -t ss69261/testing-image:latest .'
-//                     }
-//                   }
         }
 
         stage('Push Docker Image') {
@@ -45,24 +46,4 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    // Set up Kubernetes config
-                    withKubeConfig(credentialsId: KUBECONFIG_CREDENTIALS_ID) {
-                        // Deploy the Docker image to Kubernetes
-                        kubectl.apply(file: 'k8s/deployment.yaml')
-                        kubectl.apply(file: 'k8s/service.yaml')
-                    }
-                }
-            }
-        }
-    }
-
-//     post {
-//         always {
-//             // Clean up actions, such as deleting old images or workspace
-//         }
-//     }
 }
