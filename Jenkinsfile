@@ -43,6 +43,8 @@ pipeline {
                         // Push Docker image
                         docker.image(DOCKER_IMAGE_NAME).push('latest')
                     }
+                }
             }
         }
+    }
 }
