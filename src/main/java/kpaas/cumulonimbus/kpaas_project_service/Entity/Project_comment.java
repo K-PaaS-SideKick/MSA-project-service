@@ -14,7 +14,7 @@ public class Project_comment {
     @Id
     private Long comment_id;
 
-    private Long uid;
+    private String uid;
 
     private String content;
 

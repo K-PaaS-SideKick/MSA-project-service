@@ -1,12 +1,23 @@
 package kpaas.cumulonimbus.kpaas_project_service.Entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@IdClass(Project_CategoryPK.class)
+@Builder
 public class Project_Category {
-    @EmbeddedId
-    Project_CategoryPK projectCategoryPK;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "pid", nullable = false)
+    private Project project;
+
+    @Id
+    private int category;
 }

@@ -10,5 +10,5 @@ public class UpvotesPK implements Serializable {
     @JoinColumn(name = "pid", nullable = false)
     private Project pid;
 
-    private Long uid;
+    private String uid;
 }

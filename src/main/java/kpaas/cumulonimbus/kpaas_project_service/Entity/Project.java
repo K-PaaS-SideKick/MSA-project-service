@@ -2,24 +2,36 @@ package kpaas.cumulonimbus.kpaas_project_service.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class Project {
     @Id
+    @GeneratedValue
     private Long pid;
 
-    private Long uid;
+    private String uid;
 
     private String title;
 
     private LocalDateTime date;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String content;
+
+    private String repo_link;
 
     private int upvotes;
 

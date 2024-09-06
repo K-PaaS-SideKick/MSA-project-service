@@ -1,6 +1,8 @@
 # 1단계: Gradle을 사용하여 애플리케이션 빌드
 FROM gradle:8.0-jdk17 AS build
 
+ARG VAULT_SECRET
+
 # 프로젝트 소스와 Gradle wrapper를 복사
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
