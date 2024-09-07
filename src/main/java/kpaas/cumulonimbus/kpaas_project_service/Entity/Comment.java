@@ -1,18 +1,20 @@
 package kpaas.cumulonimbus.kpaas_project_service.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Project_comment {
+@Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Comment {
     @Id
-    private Long comment_id;
+    @GeneratedValue
+    private Long cid;
 
     private String uid;
 
@@ -22,7 +24,7 @@ public class Project_comment {
 
     @ManyToOne
     @JoinColumn(name = "parent_comment")
-    private Project_comment parent_comment;
+    private Comment parent_comment;
 
     @ManyToOne
     @JoinColumn(name = "parent_pid", nullable = false)

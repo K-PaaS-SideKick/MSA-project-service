@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import jakarta.persistence.EntityNotFoundException;
 import kpaas.cumulonimbus.kpaas_project_service.DAO.ProjectRepository;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.SaveProjectDTO;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.UpdateProjectDTO;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,20 @@ public class ProjectService {
         return project;
     }
 
+    @Transactional
+    public Project updateProject(Project project, UpdateProjectDTO projectDTO){
+        project.setContent(projectDTO.getContent());
+        project.setTitle(projectDTO.getTitle());
+        project.setCurrent_members(projectDTO.getCurrent_members());
+        project.setMax_members(projectDTO.getMax_members());
+        project.setRepo_link(projectDTO.getRepo_link());
+        project.setStatus(projectDTO.getStatus());
+
+        projectRepository.save(project);
+        return project;
+    }
+
+    @Transactional
     public void deleteProjectById(Long id){
         Project result = findById(id);
         projectRepository.delete(result);
