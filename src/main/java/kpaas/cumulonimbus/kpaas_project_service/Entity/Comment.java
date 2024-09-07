@@ -24,9 +24,9 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "parent_comment")
-    private Comment parent_comment;
+    private Comment parentComment;
 
     @ManyToOne
     @JoinColumn(name = "parent_pid", nullable = false)
-    private Project parent_pid;
+    private Project parentPid;
 }

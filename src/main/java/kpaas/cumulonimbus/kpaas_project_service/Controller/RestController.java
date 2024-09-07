@@ -54,6 +54,7 @@ public class RestController {
     public ResponseEntity<?> deleteProject(@RequestParam Long id) {
         Project deleteProject = projectService.findById(id);
         categoryService.deleteProjectCategoryByProject(deleteProject);
+        commentService.deleteByPid(deleteProject);
         projectService.deleteProjectById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -90,14 +91,6 @@ public class RestController {
     public List<MappingJacksonValue> search(@RequestBody SearchDTO searchDTO){
         return projectService.showProjects("");
     }
-
-    @PostMapping("/comment")
-    public ResponseEntity<?> addComment(@RequestBody NewCommentDTO commentDTO) {
-        Comment comment = commentService.saveComment(commentDTO);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
-    }
-
-
 
     @GetMapping("/kafka")
     public String kafkatest() {

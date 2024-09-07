@@ -73,6 +73,11 @@ public class ProjectService {
     }
 
     @Transactional
+    public Project save(Project project){
+        return projectRepository.save(project);
+    }
+
+    @Transactional
     public Project updateProject(Project project, UpdateProjectDTO projectDTO){
         project.setContent(projectDTO.getContent());
         project.setTitle(projectDTO.getTitle());
@@ -81,6 +86,14 @@ public class ProjectService {
         project.setRepo_link(projectDTO.getRepo_link());
         project.setStatus(projectDTO.getStatus());
 
+        projectRepository.save(project);
+        return project;
+    }
+
+    @Transactional
+    public Project increaseComments(Long pid){
+        Project project = findById(pid);
+        project.setComments(project.getComments() + 1);
         projectRepository.save(project);
         return project;
     }
