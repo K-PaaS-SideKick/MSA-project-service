@@ -1,6 +1,7 @@
 package kpaas.cumulonimbus.kpaas_project_service.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.GetCommentDTO;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.NewCommentDTO;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Comment;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
@@ -27,7 +28,7 @@ public class CommentController {
 
     @Operation(summary = "댓글 달기")
     @PostMapping("/comment")
-    public ResponseEntity<?> addComment(@RequestBody NewCommentDTO commentDTO) {
+    public ResponseEntity<Comment> addComment(@RequestBody NewCommentDTO commentDTO) {
         Comment comment = transactionHandler.newCommentTransaction(commentDTO);
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
@@ -42,7 +43,7 @@ public class CommentController {
     // project의 댓글 모두 불러오기
     @Operation(summary = "프로젝트의 댓글 모두 불러오기", description = "댓글 계층 구초 유의해서 사용")
     @GetMapping("/comment")
-    public ResponseEntity<?> getComment(@RequestParam Long pid) {
+    public ResponseEntity<GetCommentDTO> getComment(@RequestParam Long pid) {
         Project project = projectService.findById(pid);
         return new ResponseEntity<>(commentService.getCommentsByPid(project), HttpStatus.OK);
     }
