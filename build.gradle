@@ -24,6 +24,9 @@ configurations {
 }
 
 repositories {
+    maven {
+        url 'https://jcenter.bintray.com/' // JCenter 대체 리포지토리
+    }
     mavenCentral()
 }
 
