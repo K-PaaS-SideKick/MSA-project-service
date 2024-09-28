@@ -1,12 +1,23 @@
 package kpaas.cumulonimbus.kpaas_project_service.Entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@IdClass(ScrapsPK.class)
 public class Scraps {
-    @EmbeddedId
-    private ScrapsPK scrapsPK;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "pid", nullable = false)
+    private Project project;
+
+    @Id
+    private String uid;
 }

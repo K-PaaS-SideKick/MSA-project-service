@@ -1,12 +1,23 @@
 package kpaas.cumulonimbus.kpaas_project_service.Entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@IdClass(UpvotesPK.class)
 public class Upvotes {
-    @EmbeddedId
-    private UpvotesPK upvotesPK;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "pid", nullable = false)
+    private Project pid;
+
+    @Id
+    private String uid;
 }

@@ -8,6 +8,7 @@ import kpaas.cumulonimbus.kpaas_project_service.DTO.SaveProjectDTO;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.UpdateProjectDTO;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +27,26 @@ public class ProjectService {
 
     public Project findById(Long id) {
         Optional<Project> result = projectRepository.findById(id);
-        if(result.isPresent())
+        if(result.isPresent()){
             return result.get();
+        }
+
         else
             throw new EntityNotFoundException();
+    }
+
+    public List<Long> findByUserId(String userId) {
+        List<Project> projects = projectRepository.findAllByUid(userId);
+        List<Long> result = new ArrayList<>();
+        for (Project project : projects) {
+            result.add(project.getPid());
+        }
+        return result;
+    }
+
+    public boolean isOwnerByPid(Long pid, String uid){
+        Project project = findById(pid);
+        return project.getUid().equals(uid);
     }
 
     public List<MappingJacksonValue> showProjects(String option){
@@ -91,11 +108,61 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project increaseComments(Long pid){
+    public void increaseView(Project project){
+        project.setViews(project.getViews() + 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    @Async
+    public void increaseComments(Long pid){
         Project project = findById(pid);
         project.setComments(project.getComments() + 1);
         projectRepository.save(project);
-        return project;
+    }
+
+    @Transactional
+    public void increaseScraps(Long pid){
+        Project project = findById(pid);
+        project.setScraps(project.getScraps() + 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void decreaseScraps(Long pid){
+        Project project = findById(pid);
+        project.setScraps(project.getScraps() - 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void increaseUpvote(Long pid){
+        Project project = findById(pid);
+        project.setUpvotes(project.getUpvotes() + 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void decreaseUpvote(Long pid){
+        Project project = findById(pid);
+        project.setUpvotes(project.getUpvotes() - 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void increaseCurrent_members(Project project){
+        if(project.getMax_members() <= project.getCurrent_members())
+            throw new IllegalArgumentException("wrong request");
+        project.setCurrent_members(project.getCurrent_members() + 1);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void decreaseCurrent_members(Project project){
+        if(project.getCurrent_members() >= 0)
+            throw new IllegalArgumentException("wrong request");
+        project.setCurrent_members(project.getCurrent_members() - 1);
+        projectRepository.save(project);
     }
 
     @Transactional
