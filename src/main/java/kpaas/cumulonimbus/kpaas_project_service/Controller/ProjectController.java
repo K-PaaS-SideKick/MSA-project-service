@@ -1,13 +1,11 @@
 package kpaas.cumulonimbus.kpaas_project_service.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EntityNotFoundException;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.SaveProjectDTO;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.SearchDTO;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.UpdateProjectDTO;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.*;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import kpaas.cumulonimbus.kpaas_project_service.Service.*;
-import kpaas.cumulonimbus.kpaas_project_service.kafka.KafkaProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +17,11 @@ import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
 public class ProjectController {
-    private final KafkaProducer kafkaProducer;
     private final ProjectService projectService;
     private final TransactionHandler transactionHandler;
     private final ProjectFacadeService projectFacadeService;
 
-    public ProjectController(KafkaProducer kafkaProducer, ProjectService projectService, TransactionHandler transactionHandler, ProjectFacadeService projectFacadeService) {
-        this.kafkaProducer = kafkaProducer;
+    public ProjectController(ProjectService projectService, TransactionHandler transactionHandler, ProjectFacadeService projectFacadeService) {
         this.projectService = projectService;
         this.transactionHandler = transactionHandler;
         this.projectFacadeService = projectFacadeService;
@@ -58,7 +54,7 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 상세 보기")
     @GetMapping("/{pid}")
-    public ResponseEntity<?> details(@PathVariable Long pid) {
+    public ResponseEntity<Project> details(@PathVariable Long pid) {
         Project project = projectService.findById(pid);
         projectService.increaseView(project);
         return new ResponseEntity<>(project, HttpStatus.OK);
@@ -79,28 +75,28 @@ public class ProjectController {
     // 내 프로젝트 보기
     @Operation(summary = "내 프로젝트 보기", description = "내가 소유한 프로젝트의 모든 프로젝트 id")
     @GetMapping("/my")
-    public ResponseEntity<?> myProject(@RequestParam String uid) {
+    public ResponseEntity<List<Long>> myProject(@RequestParam String uid) {
         return new ResponseEntity<>(projectService.findByUserId(uid), HttpStatus.OK);
     }
 
     // 프로젝트 참가 신청
     @Operation(summary = "프로젝트 참가 신청", description = "pid를 가지고 있는 프로젝트에 참가하고 싶을 때 사용")
     @PostMapping("/{pid}/join")
-    public ResponseEntity<?> joinProject(@PathVariable Long pid, @RequestParam String uid) {
+    public ResponseEntity<JoinProjectReturnDTO> joinProject(@PathVariable Long pid, @RequestParam String uid) {
         return new ResponseEntity<>(projectFacadeService.joinRequest(pid, uid), HttpStatus.OK);
     }
 
     // 프로젝트 참가 요청 보기
     @Operation(summary = "프로젝트 참가 요청 보기", description = "pid를 가지는 프로젝트에 대한 모든 참가 요청 보기")
     @GetMapping("/{pid}/join")
-    public ResponseEntity<?> requests(@PathVariable Long pid, @RequestParam String uid) {
+    public ResponseEntity<List<JoinRequestDTO>> requests(@PathVariable Long pid, @RequestParam String uid) {
         return new ResponseEntity<>(projectFacadeService.getJoinRequests(pid, uid), HttpStatus.OK);
     }
 
     // 프로젝트 참가 승인
     @Operation(summary = "프로젝트 참가 승인", description = "pid를 가지는 프로젝트에 requester_id를 가지는 사용자가 참여신청 하였을 때 수락하기")
     @PostMapping("/{pid}/join/{requester_id}")
-    public ResponseEntity<?> acceptRequest(@PathVariable Long pid, @PathVariable String requester_id, @RequestParam String owner_id) {
+    public ResponseEntity<JoinProjectReturnDTO> acceptRequest(@PathVariable Long pid, @PathVariable String requester_id, @RequestParam String owner_id) {
         return new ResponseEntity<>(projectFacadeService.acceptJoinRequest(pid, requester_id, owner_id), HttpStatus.OK);
     }
 
@@ -112,9 +108,9 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/kafka")
-    public String kafkatest() {
-        kafkaProducer.send("주문", "사과,1");
-        return "test";
-    }
+//    @GetMapping("/kafka")
+//    public String kafkatest() {
+//        kafkaProducer.send("주문", "사과,1");
+//        return "test";
+//    }
 }

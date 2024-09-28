@@ -1,6 +1,7 @@
 package kpaas.cumulonimbus.kpaas_project_service.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.UpvoteReturnDTO;
 import kpaas.cumulonimbus.kpaas_project_service.Service.UpvoteFacadeService;
 import kpaas.cumulonimbus.kpaas_project_service.Service.UpvotesService;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class UpvoteController {
     // upvote 하기
     @Operation(summary = "upvote 하기")
     @PostMapping("/upvote")
-    public ResponseEntity<?> upvote(@RequestParam Long pid, @RequestParam String uid) {
+    public ResponseEntity<UpvoteReturnDTO> upvote(@RequestParam Long pid, @RequestParam String uid) {
         return new ResponseEntity<>(upvoteFacadeService.createUpvote(pid, uid), HttpStatus.OK);
     }
 
@@ -37,7 +38,7 @@ public class UpvoteController {
     // 사용자가 게시물에 upvote 했는지 판별
     @Operation(summary = "사용자가 게시물에 upvote 했는지 판별")
     @GetMapping("/upvote")
-    public ResponseEntity<?> getUpvote(@RequestParam Long pid, @RequestParam String uid) {
+    public ResponseEntity<Boolean> getUpvote(@RequestParam Long pid, @RequestParam String uid) {
         return new ResponseEntity<>(upvotesService.checkUpvote(pid, uid), HttpStatus.OK);
     }
 }
