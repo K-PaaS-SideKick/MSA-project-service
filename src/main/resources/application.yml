@@ -24,6 +24,11 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   application:
     name: project-service
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
 #  kafka:
 #    bootstrap-servers: kafka.dev.svc.cluster.local:9092
 #    consumer:

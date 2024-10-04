@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import jakarta.persistence.EntityNotFoundException;
 import kpaas.cumulonimbus.kpaas_project_service.DAO.ProjectRepository;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.ProjectSummary;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.SaveProjectDTO;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.UpdateProjectDTO;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -49,20 +52,12 @@ public class ProjectService {
         return project.getUid().equals(uid);
     }
 
-    public List<MappingJacksonValue> showProjects(String option){
-        List<Project> projects = new ArrayList<>();
-        if(option.equals("index")){
-            projects = projectRepository.findAll();
-        }
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept("content");
-        SimpleFilterProvider filters = new SimpleFilterProvider().addFilter("ContentFilter", filter);
+    public Page<ProjectSummary> getProjectsWithPageable(Pageable pageable) {
+        return projectRepository.findAllWithPageable(pageable);
+    }
 
-        List<MappingJacksonValue> resultProjects = new ArrayList<>();
-        for(Project project : projects){
-            MappingJacksonValue value = new MappingJacksonValue(project);
-            resultProjects.add(value);
-        }
-        return resultProjects;
+    public Page<ProjectSummary> showProjects(String title, Pageable pageable){
+        return projectRepository.findAllWithTitle(title, pageable);
     }
 
     @Transactional
@@ -84,9 +79,7 @@ public class ProjectService {
                 .repo_link(projectDTO.getRepo_link())
                 .build();
 
-        projectRepository.save(project);
-
-        return project;
+        return projectRepository.save(project);
     }
 
     @Transactional

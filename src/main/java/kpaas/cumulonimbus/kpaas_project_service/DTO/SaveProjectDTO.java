@@ -1,10 +1,13 @@
 package kpaas.cumulonimbus.kpaas_project_service.DTO;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,5 +30,6 @@ public class SaveProjectDTO {
 
     private int max_members;
 
-    private List<MultipartFile> images;
+//    @Nullable
+//    private List<MultipartFile> images = new ArrayList<>();
 }

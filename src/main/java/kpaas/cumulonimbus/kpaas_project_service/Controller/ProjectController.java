@@ -1,16 +1,22 @@
 package kpaas.cumulonimbus.kpaas_project_service.Controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import kpaas.cumulonimbus.kpaas_project_service.DTO.*;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import kpaas.cumulonimbus.kpaas_project_service.Service.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
@@ -32,11 +38,11 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    main page showing list of projects
+    //    main page showing list of projects
     @Operation(summary = "프로젝트 메인 페이지", description = "아직 상세한 기능은 미구현")
     @GetMapping("/")
-    public List<MappingJacksonValue> index(){
-        return projectService.showProjects("index");
+    public ResponseEntity<Page<ProjectSummary>> index(Pageable pageable) {
+        return new ResponseEntity<>(projectService.getProjectsWithPageable(pageable), HttpStatus.OK);
     }
 
     @Operation(summary = "프로젝트 삭제", description = "사용자 아이디 기능 추가해야함")
@@ -48,8 +54,8 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 수정")
     @PatchMapping("/")
-    public Project updateProject(@RequestBody UpdateProjectDTO projectDTO) {
-        return transactionHandler.updateProjectTransaction(projectDTO);
+    public ResponseEntity<Project> updateProject(@RequestBody UpdateProjectDTO projectDTO) {
+        return new ResponseEntity<>(transactionHandler.updateProjectTransaction(projectDTO), HttpStatus.OK);
     }
 
     @Operation(summary = "프로젝트 상세 보기")
@@ -60,16 +66,20 @@ public class ProjectController {
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
 
-    @Operation(summary = "프로젝트 생성", description = "이미지 기능은 아직 미구현.")
-    @PostMapping(path = "/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public Project createProject(@ModelAttribute SaveProjectDTO projectDTO) {
-        return transactionHandler.createProjectTransaction(projectDTO);
+    @Operation(summary = "프로젝트 생성", description = "이미지 기능은 아직 미구현. ")
+//    @PostMapping(path = "/new")
+    @PostMapping(path = "/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Project> createProject(
+            @RequestPart(required = false) List<MultipartFile> images,
+            @Parameter(description = "application/json 지정해야 등록 됨", content = @Content(mediaType = "application/json"))
+            @RequestPart SaveProjectDTO projectDTO) {
+        return new ResponseEntity<>(transactionHandler.createProjectTransaction(projectDTO), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "프로젝트 검색", description = "아직 미구현.")
+    @Operation(summary = "프로젝트 검색", description = "request, response 필드 값 잘 보기")
     @PostMapping("/search")
-    public List<MappingJacksonValue> search(@RequestBody SearchDTO searchDTO){
-        return projectService.showProjects("");
+    public ResponseEntity<Page<ProjectSummary>> search(@RequestParam String titleQuery, Pageable pageable) {
+        return new ResponseEntity<>(projectService.showProjects(titleQuery, pageable), HttpStatus.OK);
     }
 
     // 내 프로젝트 보기
