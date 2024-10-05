@@ -10,7 +10,7 @@ pipeline {
             spec:
               containers:
               - name: docker
-                image: docker:24.0.1-dind
+                image: docker:27.3.1-dind
                 securityContext:
                   privileged: true
                 volumeMounts:
@@ -23,7 +23,7 @@ pipeline {
                 - containerPort: 2375
                   name: docker
               - name: docker-cli
-                image: docker:24.0.1-cli
+                image: docker:27.3.1-cli
                 command:
                 - cat
                 tty: true
