@@ -1,5 +1,5 @@
 # 1단계: Gradle을 사용하여 애플리케이션 빌드
-FROM gradle:7-jdk17 AS build
+FROM gradle:8.10.2-jdk17-alpine AS build
 
 ARG VAULT_SECRET
 
