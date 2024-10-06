@@ -90,7 +90,7 @@ pipeline {
                     script {
                         withCredentials([string(credentialsId: 'vault-key', variable: 'VAULT_SECRET')]){
                             sh """
-                            docker build --build-arg VAULT_SECRET=${VAULT_SECRET} -t ${DOCKERHUB_REPO}:${GIT_TAG} .
+                            docker build -t ${DOCKERHUB_REPO}:${GIT_TAG} .
                             """
                         }
                     }
