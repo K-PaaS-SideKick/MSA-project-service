@@ -46,7 +46,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://eureka-service.dev.svc.cluster.local:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka
     enabled: false
   instance:
     hostname: localhost
