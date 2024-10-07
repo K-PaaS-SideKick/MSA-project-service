@@ -6,7 +6,7 @@ COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 
 # Gradle wrapper를 사용하여 종속성 다운로드 및 빌드
-RUN gradle build -x test --no-daemon --info
+RUN gradle build -x test
 
 # 2단계: 빌드된 애플리케이션을 실행할 런타임 이미지 생성
 FROM bellsoft/liberica-openjdk-alpine:17
