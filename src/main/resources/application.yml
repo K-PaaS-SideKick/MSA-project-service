@@ -47,7 +47,7 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://198.18.0.169:8761/eureka
-    enabled: false
+    enabled: true
   instance:
     hostname: localhost
     prefer-ip-address: true
