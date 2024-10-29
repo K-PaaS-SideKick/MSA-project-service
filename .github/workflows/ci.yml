@@ -7,9 +7,9 @@ on:
 
 env:
   DOCKERHUB_REPO: 'sangwookie/sidekick-project-service'
-  GIT_REPO: 'https://github.com/K-PaaS-SideKick/MSA-project-service'
+  GIT_REPO: 'K-PaaS-SideKick/MSA-project-service'
   DOCKERHUB_CREDENTIALS_ID: 'DockerCred'
-  HELM_CHART_REPO: 'https://github.com/K-PaaS-SideKick/project-service-chart'
+  HELM_CHART_REPO: 'K-PaaS-SideKick/project-service-chart'
 
 jobs:
   build:
