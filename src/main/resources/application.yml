@@ -40,6 +40,7 @@ spring:
 #      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 server:
   port: 8081
+  forward-headers-strategy: framework
 
 eureka:
   client:
