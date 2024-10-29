@@ -19,18 +19,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUBCRED }}
-          
-      - name: Fetch All Tags
-        run: git fetch --tags  # 모든 태그를 가져옵니다.
 
-      - name: Get Latest Tag from Main Branch
-        id: get_latest_tag
-        run: |
-          # 메인 브랜치로 체크아웃
-          git checkout main
-          # 최신 태그 가져오기
-          LATEST_TAG=$(git tag --sort=-creatordate | head -n 1)
-          echo "GIT_TAG=${LATEST_TAG}" >> $GITHUB_ENV  # 환경 변수에 설정
+      - name: Get Commit SHA
+        run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV  # 커밋 SHA를 환경 변수로 설정
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -43,11 +34,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t $DOCKERHUB_REPO:${{ env.GIT_TAG }} .
+          docker build -t $DOCKERHUB_REPO:${{ env.COMMIT_SHA }} .
 
       - name: Push Docker Image
         run: |
-          docker push $DOCKERHUB_REPO:${{ env.GIT_TAG }}
+          docker push $DOCKERHUB_REPO:${{ env.COMMIT_SHA }}
 
   helm-update:
     runs-on: ubuntu-latest
@@ -62,9 +53,9 @@ jobs:
 
       - name: Update Helm Chart
         run: |
-          sed -i "s/^  tag: .*/  tag: ${{ env.GIT_TAG }}/" ./values.yaml
+          sed -i "s/^  tag: .*/  tag: ${{ env.COMMIT_SHA }}/" ./values.yaml
           git add ./values.yaml
           git config user.name "SangWookie"
           git config user.email "swcube520@gmail.com"
-          git commit --allow-empty -m "trigger argocd: ${{ env.GIT_TAG }}"
+          git commit --allow-empty -m "trigger argocd: ${{ env.COMMIT_SHA }}"
           git push origin main
