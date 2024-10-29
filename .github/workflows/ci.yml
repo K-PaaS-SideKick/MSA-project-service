@@ -7,8 +7,8 @@ on:
 
 env:
   DOCKERHUB_REPO: 'sangwookie/sidekick-project-service'
-  DOCKERHUB_CREDENTIALS_ID: 'DockerCred'
   HELM_CHART_REPO: 'K-PaaS-SideKick/project-service-chart'
+  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   build:
@@ -20,8 +20,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUBCRED }}
 
-      - name: Get Commit SHA
-        run: echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV  # 커밋 SHA를 환경 변수로 설정
+      # - name: Get Commit SHA
+      #   run: echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV  # 커밋 SHA를 환경 변수로 설정
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -34,11 +34,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t $DOCKERHUB_REPO:${{ env.COMMIT_SHA }} .
+          docker build -t $DOCKERHUB_REPO:$COMMIT_SHA .
 
       - name: Push Docker Image
         run: |
-          docker push $DOCKERHUB_REPO:${{ env.COMMIT_SHA }}
+          docker push $DOCKERHUB_REPO:$COMMIT_SHA
 
   helm-update:
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
 
       - name: Update Helm Chart
         run: |
-          sed -i "s/^  tag: .*/  tag: ${{ env.COMMIT_SHA }}/" ./values.yaml
+          sed -i "s/^  tag: .*/  tag: $COMMIT_SHA/" ./values.yaml
           git add ./values.yaml
           git config user.name "SangWookie"
           git config user.email "swcube520@gmail.com"
