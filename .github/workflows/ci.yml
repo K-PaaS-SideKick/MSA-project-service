@@ -3,11 +3,10 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # 메인 브랜치에 푸시될 때 트리거
 
 env:
   DOCKERHUB_REPO: 'sangwookie/sidekick-project-service'
-  GIT_REPO: 'K-PaaS-SideKick/MSA-project-service'
   DOCKERHUB_CREDENTIALS_ID: 'DockerCred'
   HELM_CHART_REPO: 'K-PaaS-SideKick/project-service-chart'
 
@@ -19,14 +18,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ env.GIT_REPO }}
           token: ${{ secrets.GITHUBCRED }}
+          
+      - name: Fetch All Tags
+        run: git fetch --tags  # 모든 태그를 가져옵니다.
+
+      - name: Get Latest Tag from Main Branch
+        id: get_latest_tag
+        run: |
+          git checkout main  # 메인 브랜치로 체크아웃
+          LATEST_TAG=$(git describe --tags --abbrev=0)  # 최신 태그를 가져옵니다.
+          echo "GIT_TAG=${LATEST_TAG}" >> $GITHUB_ENV  # 환경 변수에 설정
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Set Git Tag from Ref
-        run: echo "GIT_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -37,7 +42,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t $DOCKERHUB_REPO:${{ env.GIT_TAG }} .
-        
+
       - name: Push Docker Image
         run: |
           docker push $DOCKERHUB_REPO:${{ env.GIT_TAG }}
@@ -50,7 +55,7 @@ jobs:
       - name: Checkout Helm Chart Repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ env.HELM_CHART_REPO }}
+          repository: K-PaaS-SideKick/project-service-chart
           token: ${{ secrets.GITHUBCRED }}
 
       - name: Update Helm Chart
