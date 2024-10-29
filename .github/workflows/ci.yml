@@ -2,8 +2,8 @@ name: CI Pipeline
 
 on:
   push:
-    tags:
-      - '*'  # 모든 태그 푸시에 대해 트리거
+    branches:
+      - main  # 메인 브랜치에 푸시될 때 트리거
 
 env:
   DOCKERHUB_REPO: 'sangwookie/sidekick-project-service'
@@ -19,9 +19,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUBCRED }}
+          
+      - name: Fetch All Tags
+        run: git fetch --tags  # 모든 태그를 가져옵니다.
 
-      - name: Set GIT_TAG
-        run: echo "GIT_TAG=${{ github.ref_name }}" >> $GITHUB_ENV  # 태그 이름을 환경 변수로 설정
+      - name: Get Latest Tag from Main Branch
+        id: get_latest_tag
+        run: |
+          # 메인 브랜치로 체크아웃
+          git checkout main
+          # 최신 태그 가져오기
+          LATEST_TAG=$(git tag --sort=-creatordate | head -n 1)
+          echo "GIT_TAG=${LATEST_TAG}" >> $GITHUB_ENV  # 환경 변수에 설정
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
