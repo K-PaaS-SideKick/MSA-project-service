@@ -45,4 +45,21 @@ public class ProjectSummary {
 //            this.images.add(image.getId());
 //        }
     }
+
+    public ProjectSummary(Long pid, String uid, String title, String content, LocalDateTime date,
+                          int upvotes, int comments, int views, int scraps, String status,
+                          int max_members, int current_members) {
+        this.pid = pid;
+        this.uid = uid;
+        this.title = title;
+        this.content = content;
+        this.date = date;
+        this.upvotes = upvotes;
+        this.comments = comments;
+        this.views = views;
+        this.scraps = scraps;
+        this.status = status;
+        this.max_members = max_members;
+        this.current_members = current_members;
+    }
 }
