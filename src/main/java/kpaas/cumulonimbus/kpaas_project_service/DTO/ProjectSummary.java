@@ -14,6 +14,7 @@ public class ProjectSummary {
     private Long pid;
     private String uid;
     private String title;
+    private String content;
     private LocalDateTime date;
     private int upvotes;
     private int comments;
@@ -27,6 +28,7 @@ public class ProjectSummary {
         this.pid = project.getPid();
         this.uid = project.getUid();
         this.title = project.getTitle();
+        this.content = project.getContent();
         this.date = project.getDate();
         this.upvotes = project.getUpvotes();
         this.comments = project.getComments();

@@ -67,7 +67,6 @@ public class ProjectController {
     }
 
     @Operation(summary = "프로젝트 생성", description = "이미지 기능은 아직 미구현. ")
-//    @PostMapping(path = "/new")
     @PostMapping(path = "/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Project> createProject(
             @RequestPart(required = false) List<MultipartFile> images,
