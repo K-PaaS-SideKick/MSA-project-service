@@ -19,8 +19,9 @@ import java.util.List;
 import static kpaas.cumulonimbus.kpaas_project_service.Entity.QProject.project;
 
 @Repository
-public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
+public class ProjectCustomRepositoryImpl implements ProjectCustomRepository {
     private final JPAQueryFactory queryFactory;
+
     public ProjectCustomRepositoryImpl(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
@@ -34,7 +35,7 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
                 .where(project.title.containsIgnoreCase(title));
 
         Long total = query.fetchOne();
-        if(total == null)
+        if (total == null)
             throw new EntityNotFoundException("No project found with title " + title);
 
         List<ProjectSummary> projects = query
@@ -50,7 +51,7 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
     }
 
     @Override
-    public Page<ProjectSummary> findAllWithPageable(Pageable pageable){
+    public Page<ProjectSummary> findAllWithPageable(Pageable pageable) {
         QProject project = QProject.project;
         JPAQuery<ProjectSummary> query = queryFactory
                 .select(Projections.constructor(ProjectSummary.class, project.pid, project.uid, project.title, project.content, project.date, project.upvotes, project.comments, project.views, project.scraps, project.status, project.max_members, project.current_members))

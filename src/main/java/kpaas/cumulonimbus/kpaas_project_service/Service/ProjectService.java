@@ -22,19 +22,19 @@ import java.util.Optional;
 
 @Service
 public class ProjectService {
+    private final ProjectCategoryService projectCategoryService;
     ProjectRepository projectRepository;
 
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, ProjectCategoryService projectCategoryService) {
         this.projectRepository = projectRepository;
+        this.projectCategoryService = projectCategoryService;
     }
 
     public Project findById(Long id) {
         Optional<Project> result = projectRepository.findById(id);
-        if(result.isPresent()){
+        if (result.isPresent()) {
             return result.get();
-        }
-
-        else
+        } else
             throw new EntityNotFoundException();
     }
 
@@ -47,21 +47,31 @@ public class ProjectService {
         return result;
     }
 
-    public boolean isOwnerByPid(Long pid, String uid){
+    public boolean isOwnerByPid(Long pid, String uid) {
         Project project = findById(pid);
         return project.getUid().equals(uid);
     }
 
     public Page<ProjectSummary> getProjectsWithPageable(Pageable pageable) {
-        return projectRepository.findAllWithPageable(pageable);
+        Page<ProjectSummary> summaries = projectRepository.findAllWithPageable(pageable);
+        summaries.forEach(projectSummary -> {
+            List<Integer> categories = projectCategoryService.getProjectCategory(findById(projectSummary.getPid()));
+            projectSummary.setCategory(categories);
+        });
+        return summaries;
     }
 
-    public Page<ProjectSummary> showProjects(String title, Pageable pageable){
-        return projectRepository.findAllWithTitle(title, pageable);
+    public Page<ProjectSummary> showProjects(String title, Pageable pageable) {
+        Page<ProjectSummary> summaries = projectRepository.findAllWithTitle(title, pageable);
+        summaries.forEach(projectSummary -> {
+            List<Integer> categories = projectCategoryService.getProjectCategory(findById(projectSummary.getPid()));
+            projectSummary.setCategory(categories);
+        });
+        return summaries;
     }
 
     @Transactional
-    public Project saveNewProject(SaveProjectDTO projectDTO){
+    public Project saveNewProject(SaveProjectDTO projectDTO) {
         LocalDateTime now = LocalDateTime.now();
 
         Project project = Project.builder()
@@ -83,12 +93,12 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project save(Project project){
+    public Project save(Project project) {
         return projectRepository.save(project);
     }
 
     @Transactional
-    public Project updateProject(Project project, UpdateProjectDTO projectDTO){
+    public Project updateProject(Project project, UpdateProjectDTO projectDTO) {
         project.setContent(projectDTO.getContent());
         project.setTitle(projectDTO.getTitle());
         project.setCurrent_members(projectDTO.getCurrent_members());
@@ -101,65 +111,65 @@ public class ProjectService {
     }
 
     @Transactional
-    public void increaseView(Project project){
+    public void increaseView(Project project) {
         project.setViews(project.getViews() + 1);
         projectRepository.save(project);
     }
 
     @Transactional
     @Async
-    public void increaseComments(Long pid){
+    public void increaseComments(Long pid) {
         Project project = findById(pid);
         project.setComments(project.getComments() + 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void increaseScraps(Long pid){
+    public void increaseScraps(Long pid) {
         Project project = findById(pid);
         project.setScraps(project.getScraps() + 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void decreaseScraps(Long pid){
+    public void decreaseScraps(Long pid) {
         Project project = findById(pid);
         project.setScraps(project.getScraps() - 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void increaseUpvote(Long pid){
+    public void increaseUpvote(Long pid) {
         Project project = findById(pid);
         project.setUpvotes(project.getUpvotes() + 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void decreaseUpvote(Long pid){
+    public void decreaseUpvote(Long pid) {
         Project project = findById(pid);
         project.setUpvotes(project.getUpvotes() - 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void increaseCurrent_members(Project project){
-        if(project.getMax_members() <= project.getCurrent_members())
+    public void increaseCurrent_members(Project project) {
+        if (project.getMax_members() <= project.getCurrent_members())
             throw new IllegalArgumentException("wrong request");
         project.setCurrent_members(project.getCurrent_members() + 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void decreaseCurrent_members(Project project){
-        if(project.getCurrent_members() >= 0)
+    public void decreaseCurrent_members(Project project) {
+        if (project.getCurrent_members() >= 0)
             throw new IllegalArgumentException("wrong request");
         project.setCurrent_members(project.getCurrent_members() - 1);
         projectRepository.save(project);
     }
 
     @Transactional
-    public void deleteProjectById(Long id){
+    public void deleteProjectById(Long id) {
         Project result = findById(id);
         projectRepository.delete(result);
     }

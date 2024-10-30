@@ -45,7 +45,9 @@ public class TransactionHandler {
     public ProjectSummary createProjectTransaction(SaveProjectDTO projectDTO, List<MultipartFile> images) throws IOException {
         Project newProject = projectService.saveNewProject(projectDTO);
         categoryService.saveProjectCategories(newProject, projectDTO.getCategory());
-        return new ProjectSummary(newProject);
+        ProjectSummary summary = new ProjectSummary(newProject);
+        summary.setCategory(categoryService.getProjectCategory(newProject));
+        return summary;
     }
 
 //    public byte[] getImage(Long id){
