@@ -29,11 +29,13 @@ public class ProjectController {
     private final ProjectService projectService;
     private final TransactionHandler transactionHandler;
     private final ProjectFacadeService projectFacadeService;
+    private final ProjectCategoryService projectCategoryService;
 
-    public ProjectController(ProjectService projectService, TransactionHandler transactionHandler, ProjectFacadeService projectFacadeService) {
+    public ProjectController(ProjectService projectService, TransactionHandler transactionHandler, ProjectFacadeService projectFacadeService, ProjectCategoryService projectCategoryService) {
         this.projectService = projectService;
         this.transactionHandler = transactionHandler;
         this.projectFacadeService = projectFacadeService;
+        this.projectCategoryService = projectCategoryService;
     }
 
     @GetMapping("/status")
@@ -57,16 +59,18 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 수정")
     @PatchMapping("/")
-    public ResponseEntity<Project> updateProject(@RequestBody UpdateProjectDTO projectDTO) {
+    public ResponseEntity<ProjectDetail> updateProject(@RequestBody UpdateProjectDTO projectDTO) {
         return new ResponseEntity<>(transactionHandler.updateProjectTransaction(projectDTO), HttpStatus.OK);
     }
 
     @Operation(summary = "프로젝트 상세 보기")
     @GetMapping("/{pid}")
-    public ResponseEntity<Project> details(@PathVariable Long pid) {
+    public ResponseEntity<ProjectDetail> details(@PathVariable Long pid) {
         Project project = projectService.findById(pid);
+        ProjectDetail detail = new ProjectDetail(project);
+        detail.setCategories(projectCategoryService.getProjectCategory(project));
         projectService.increaseView(project);
-        return new ResponseEntity<>(project, HttpStatus.OK);
+        return new ResponseEntity<>(detail, HttpStatus.OK);
     }
 
     @Operation(summary = "프로젝트 생성", description = "이미지 기능은 아직 미구현. ")
@@ -78,19 +82,19 @@ public class ProjectController {
         return new ResponseEntity<>(transactionHandler.createProjectTransaction(projectDTO, images), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "이미지 보기", description = "이미지 id를 요청")
-    @GetMapping(path = "/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        byte[] imageBytes = transactionHandler.getImage(id);
-
-        if (imageBytes == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "image/jpeg");
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-    }
+//    @Operation(summary = "이미지 보기", description = "이미지 id를 요청")
+//    @GetMapping(path = "/image/{id}")
+//    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+//        byte[] imageBytes = transactionHandler.getImage(id);
+//
+//        if (imageBytes == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Content-Type", "image/jpeg");
+//        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+//    }
 
     @Operation(summary = "프로젝트 검색", description = "request, response 필드 값 잘 보기")
     @PostMapping("/search")

@@ -1,12 +1,8 @@
 package kpaas.cumulonimbus.kpaas_project_service.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.NewCommentDTO;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.ProjectSummary;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.SaveProjectDTO;
-import kpaas.cumulonimbus.kpaas_project_service.DTO.UpdateProjectDTO;
+import kpaas.cumulonimbus.kpaas_project_service.DTO.*;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Comment;
-import kpaas.cumulonimbus.kpaas_project_service.Entity.Image;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import kpaas.cumulonimbus.kpaas_project_service.Entity.Scraps;
 import org.springframework.stereotype.Service;
@@ -22,14 +18,12 @@ public class TransactionHandler {
     private final ProjectService projectService;
     private final ProjectCategoryService categoryService;
     private final ScrapsService scrapsService;
-    private final ImageService imageService;
 
-    public TransactionHandler(CommentService commentService, ProjectService projectService, ProjectCategoryService categoryService, ScrapsService scrapsService, ImageService imageService) {
+    public TransactionHandler(CommentService commentService, ProjectService projectService, ProjectCategoryService categoryService, ScrapsService scrapsService) {
         this.commentService = commentService;
         this.projectService = projectService;
         this.categoryService = categoryService;
         this.scrapsService = scrapsService;
-        this.imageService = imageService;
     }
 
     @Transactional
@@ -51,18 +45,15 @@ public class TransactionHandler {
     public ProjectSummary createProjectTransaction(SaveProjectDTO projectDTO, List<MultipartFile> images) throws IOException {
         Project newProject = projectService.saveNewProject(projectDTO);
         categoryService.saveProjectCategories(newProject, projectDTO.getCategory());
-        for(MultipartFile image : images){
-            imageService.saveImage(image);
-        }
         return new ProjectSummary(newProject);
     }
 
-    public byte[] getImage(Long id){
-        return imageService.getImageById(id);
-    }
+//    public byte[] getImage(Long id){
+//        return imageService.getImageById(id);
+//    }
 
     @Transactional
-    public Project updateProjectTransaction(UpdateProjectDTO projectDTO){
+    public ProjectDetail updateProjectTransaction(UpdateProjectDTO projectDTO){
         Project project = projectService.findById(projectDTO.getPid());
         if (project == null) throw new EntityNotFoundException();
 
@@ -70,6 +61,9 @@ public class TransactionHandler {
         categoryService.deleteProjectCategoryByProject(project);
         categoryService.saveProjectCategories(project, projectDTO.getCategory());
 
-        return projectService.updateProject(project, projectDTO);
+        Project updatedProject = projectService.updateProject(project, projectDTO);
+        ProjectDetail detail = new ProjectDetail(updatedProject);
+        detail.setCategories(categoryService.getProjectCategory(updatedProject));
+        return detail;
     }
 }

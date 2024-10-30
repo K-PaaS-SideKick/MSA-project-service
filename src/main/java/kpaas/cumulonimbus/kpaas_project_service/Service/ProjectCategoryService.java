@@ -6,6 +6,7 @@ import kpaas.cumulonimbus.kpaas_project_service.Entity.Project_Category;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,5 +31,14 @@ public class ProjectCategoryService {
     @Transactional
     public void deleteProjectCategoryByProject(Project project){
         projectCategoryRepository.deleteByProject(project);
+    }
+
+    public List<Integer> getProjectCategory(Project project){
+        List<Project_Category> categories = projectCategoryRepository.findAllByProject(project);
+        List<Integer> categoryList = new ArrayList<>();
+        for(Project_Category category : categories){
+            categoryList.add(category.getCategory());
+        }
+        return categoryList;
     }
 }

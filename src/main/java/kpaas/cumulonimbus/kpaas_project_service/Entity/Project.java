@@ -44,6 +44,6 @@ public class Project {
 
     private int current_members;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Image> images;
+//    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+//    private List<Image> images;
 }
