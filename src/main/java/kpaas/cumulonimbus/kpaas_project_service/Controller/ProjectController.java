@@ -11,6 +11,7 @@ import kpaas.cumulonimbus.kpaas_project_service.Entity.Project;
 import kpaas.cumulonimbus.kpaas_project_service.Service.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,9 @@ import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.sql.SQLException;
 import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
@@ -68,11 +71,25 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 생성", description = "이미지 기능은 아직 미구현. ")
     @PostMapping(path = "/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Project> createProject(
+    public ResponseEntity<ProjectSummary> createProject(
             @RequestPart(required = false) List<MultipartFile> images,
             @Parameter(description = "application/json 지정해야 등록 됨", content = @Content(mediaType = "application/json"))
-            @RequestPart SaveProjectDTO projectDTO) {
-        return new ResponseEntity<>(transactionHandler.createProjectTransaction(projectDTO), HttpStatus.CREATED);
+            @RequestPart SaveProjectDTO projectDTO) throws IOException {
+        return new ResponseEntity<>(transactionHandler.createProjectTransaction(projectDTO, images), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "이미지 보기", description = "이미지 id를 요청")
+    @GetMapping(path = "/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+        byte[] imageBytes = transactionHandler.getImage(id);
+
+        if (imageBytes == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "image/jpeg");
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 
     @Operation(summary = "프로젝트 검색", description = "request, response 필드 값 잘 보기")
