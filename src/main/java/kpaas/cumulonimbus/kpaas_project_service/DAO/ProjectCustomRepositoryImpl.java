@@ -38,7 +38,7 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
             throw new EntityNotFoundException("No project found with title " + title);
 
         List<ProjectSummary> projects = query
-                .select(Projections.constructor(ProjectSummary.class, project.pid, project.uid, project.title, project.date, project.upvotes, project.comments, project.views, project.scraps, project.status, project.max_members, project.current_members))
+                .select(Projections.constructor(ProjectSummary.class, project.pid, project.uid, project.title, project.content, project.date, project.upvotes, project.comments, project.views, project.scraps, project.status, project.max_members, project.current_members))
                 .from(project)
                 .where(project.title.containsIgnoreCase(title))
                 .offset(pageable.getOffset())
@@ -53,7 +53,7 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository{
     public Page<ProjectSummary> findAllWithPageable(Pageable pageable){
         QProject project = QProject.project;
         JPAQuery<ProjectSummary> query = queryFactory
-                .select(Projections.constructor(ProjectSummary.class, project.pid, project.uid, project.title, project.date, project.upvotes, project.comments, project.views, project.scraps, project.status, project.max_members, project.current_members))
+                .select(Projections.constructor(ProjectSummary.class, project.pid, project.uid, project.title, project.content, project.date, project.upvotes, project.comments, project.views, project.scraps, project.status, project.max_members, project.current_members))
                 .from(project);
         List<ProjectSummary> results = query.offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
